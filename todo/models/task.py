@@ -44,30 +44,30 @@ class TaskStatus(str, enum.Enum):
 class Task(SQLModel, table=True):
     """Represents the Task Model"""
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     text: str
     date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     status: TaskStatus = Field(default='TODO', sa_column=Column(Enum(TaskStatus)), nullable=False)
     user_id: int = Field(foreign_key="user.id")
 
-    # It populates a `.posts` attribute to the `User` model.
-    user: Optional['User'] = Relationship(back_populates="tasks")
+    # It populates a `.tasks` attribute to the `User` model.
+    user: 'User' = Relationship(back_populates="tasks")
 
 
 class TaskResponse(BaseModel):
-    """Serializer for Post Response"""
+    """Serializer for Task Response"""
 
     id: int
     text: str
     date: datetime
     user_id: int
-    parent_id: Optional[int]
 
 
 class TaskRequest(BaseModel):
-    """Serializer for Post request payload"""
+    """Serializer for Task request payload"""
     
     text: str
+    status: Optional[TaskStatus]
 
     class Config:
         extra = Extra.allow
