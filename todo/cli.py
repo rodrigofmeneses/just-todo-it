@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 
 from .config import settings
 from .db import engine
-from .models import User
+from .models import User, Task, TaskStatus
 
 main = typer.Typer(name="Todo CLI")
 
@@ -19,6 +19,8 @@ def shell():
         "select": select,
         "session": Session(engine),
         "User": User,
+        "Task": Task,
+        "TaskStatus": TaskStatus,
     }
     typer.echo(f"Auto imports: {list(_vars.keys())}")
     try:
@@ -37,14 +39,14 @@ def shell():
 def user_list():
     """Lists all users"""
     table = Table(title="Todo users")
-    fields = ["username"]
+    fields = ['id', 'username']
     for header in fields:
         table.add_column(header, style="magenta")
 
     with Session(engine) as session:
         users = session.exec(select(User))
         for user in users:
-            table.add_row(user.username)
+            table.add_row(str(user.id), user.username)
 
     Console().print(table)
 

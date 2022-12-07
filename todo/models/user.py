@@ -1,9 +1,11 @@
-from typing import Optional
-from sqlmodel import Field, SQLModel
+from typing import TYPE_CHECKING, Optional, List
+from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
 
 from todo.security import HashedPassword
 
+if TYPE_CHECKING:
+    from todo.models import Task
 
 class User(SQLModel, table=True):
     '''Represents the User Model'''
@@ -11,6 +13,8 @@ class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True, nullable=False)
     password: HashedPassword = Field(nullable=False)
+    
+    tasks: List['Task'] = Relationship(back_populates='user')
 
 
 class UserResponse(BaseModel):
