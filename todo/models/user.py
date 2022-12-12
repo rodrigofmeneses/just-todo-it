@@ -17,15 +17,18 @@ class User(SQLModel, table=True):
     tasks: List['Task'] = Relationship(back_populates='user')
 
 
-class UserResponse(BaseModel):
+class UserBase(BaseModel):
+    '''Base User serializer'''
+    username: str
+
+
+class UserResponse(UserBase):
     '''Serializer for User Response'''
     
     id: int
-    username: str
 
 
-class UserRequest(BaseModel):
+class UserRequest(UserBase):
     '''Serializer for User Request payload'''
     
-    username: str
     password: str
