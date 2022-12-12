@@ -48,12 +48,40 @@ async def create_task(
     task: TaskRequest,
     user: User = AuthenticatedUser,
 ):
-    '''Create new task'''
+    """Create new task"""
     task.user_id = user.id
-    
     db_task = Task.from_orm(task)
-    
+
     session.add(db_task)
     session.commit()
     session.refresh(db_task)
     return db_task
+
+
+@router.put("/{task_id}/", response_model=TaskResponse)
+async def update_task(
+    *,
+    session: Session = ActiveSession,
+    user: User = AuthenticatedUser,
+    task_body: TaskRequest,
+    task_id: int,
+):
+    """Update Task"""
+    task = session.exec(select(Task).where(Task.id == task_id)).first()
+
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+    if task.user.id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No Permission to update task of another user",
+        )
+
+    query = update(Task).where(Task.id == task_id).values(**task_body.dict())
+    session.exec(query)
+    session.commit()
+    session.refresh(task)
+
+    return task
