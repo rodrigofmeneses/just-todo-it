@@ -59,6 +59,7 @@ class TaskResponse(BaseModel):
 
     id: int
     text: str
+    status: TaskStatus
     date: datetime
     user_id: int
 
@@ -67,7 +68,7 @@ class TaskRequest(BaseModel):
     """Serializer for Task request payload"""
     
     text: str
-    status: Optional[TaskStatus]
+    status: Optional[TaskStatus] = 'TODO'
 
     class Config:
         extra = Extra.allow
