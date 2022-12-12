@@ -6,6 +6,6 @@ from .user import router as user_router
 
 main_router = APIRouter()
 
-main_router.include_router(auth_router, tags=["auth"])
-main_router.include_router(task_router, prefix="/task", tags=["task"])
-main_router.include_router(user_router, prefix="/user", tags=["user"])
+main_router.include_router(auth_router, prefix="/api", tags=["auth"])
+main_router.include_router(task_router, prefix="/api/task", tags=["task"])
+main_router.include_router(user_router, prefix="/api/user", tags=["user"])
