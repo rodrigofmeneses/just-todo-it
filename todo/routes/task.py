@@ -105,3 +105,32 @@ async def update_task(
     session.commit()
     session.refresh(task)
     return task
+
+
+@router.delete('/{task_id}')
+async def delete_task(
+    *,
+    session: Session = ActiveSession,
+    user: User = AuthenticatedUser,
+    task_id: int
+):
+    '''Delete Task'''
+    
+    task = session.get(Task, task_id)
+    
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Task not found"
+        )
+    
+    if task.user.id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No Permission to update task of another user",
+        )
+    
+    session.delete(task)
+    session.commit()
+
+    return {"msg": f"Task {task_id} Deleted", "task": task}
