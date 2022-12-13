@@ -6,7 +6,11 @@ from sqlmodel import Session, select, update
 
 from todo.auth import AuthenticatedUser
 from todo.db import ActiveSession
-from todo.models.task import Task, TaskRequest, TaskResponse
+from todo.models.task import (
+    Task, TaskRequest, 
+    TaskResponse, 
+    UpdateTaskRequest
+)
 from todo.models.user import User
 
 router = APIRouter()
@@ -38,14 +42,14 @@ async def task_by_id(
     ):
     """Get task by task id"""
     task = session.get(Task, task_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
     if user.id != task.user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Don't have authorization to see another user task"
-        )
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
         )
     return task
 
