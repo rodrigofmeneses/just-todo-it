@@ -73,3 +73,10 @@ class TaskRequest(BaseModel):
     class Config:
         extra = Extra.allow
         arbitrary_types_allowed = True
+
+
+class UpdateTaskRequest(SQLModel):
+    '''Serializer for Update Task request'''
+    
+    text: Optional[str]
+    status: Optional[TaskStatus]

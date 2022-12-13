@@ -76,7 +76,7 @@ async def update_task(
     *,
     session: Session = ActiveSession,
     user: User = AuthenticatedUser,
-    task_body: TaskRequest,
+    task_body: UpdateTaskRequest,
     task_id: int,
 ):
     """Update Task"""
