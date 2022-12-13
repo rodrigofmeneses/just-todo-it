@@ -17,7 +17,7 @@ SECRET_KEY = settings.security.secret_key
 ALGORITHM = settings.security.algorithm
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 
 class Token(BaseModel):
