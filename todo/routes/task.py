@@ -30,9 +30,19 @@ async def list_all_tasks_by_user(
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-async def task_by_id(*, session: Session = ActiveSession, task_id: int):
+async def task_by_id(
+        *, 
+        session: Session = ActiveSession, 
+        user: User = AuthenticatedUser,
+        task_id: int
+    ):
     """Get task by task id"""
     task = session.get(Task, task_id)
+    if user.id != task.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Don't have authorization to see another user task"
+        )
     if not task:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
@@ -44,8 +54,8 @@ async def task_by_id(*, session: Session = ActiveSession, task_id: int):
 async def create_task(
     *,
     session: Session = ActiveSession,
-    task: TaskRequest,
     user: User = AuthenticatedUser,
+    task: TaskRequest,
 ):
     """Create new task"""
     task.user_id = user.id
