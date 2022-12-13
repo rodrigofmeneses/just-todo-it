@@ -19,19 +19,7 @@ async def list_all_tasks(*, session: Session = ActiveSession):
     return tasks
 
 
-@router.get("/{task_id}", response_model=TaskResponse)
-async def task_by_id(*, session: Session = ActiveSession, task_id: int):
-    """Get task by task id"""
-    statement = select(Task).where(Task.id == task_id)
-    task = session.exec(statement).first()
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-        )
-    return task
-
-
-@router.get("/me/", response_model=List[TaskResponse])
+@router.get("/me", response_model=List[TaskResponse])
 async def list_all_tasks_by_user(
     *, session: Session = ActiveSession, user: User = AuthenticatedUser
 ):
@@ -39,6 +27,17 @@ async def list_all_tasks_by_user(
     query = select(Task).where(Task.user_id == user.id)
     tasks = session.exec(query).all()
     return tasks
+
+
+@router.get("/{task_id}", response_model=TaskResponse)
+async def task_by_id(*, session: Session = ActiveSession, task_id: int):
+    """Get task by task id"""
+    task = session.get(Task, task_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+    return task
 
 
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
