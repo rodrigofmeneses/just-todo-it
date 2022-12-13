@@ -71,7 +71,7 @@ async def create_task(
     return db_task
 
 
-@router.put("/{task_id}/", response_model=TaskResponse)
+@router.patch("/{task_id}", response_model=TaskResponse)
 async def update_task(
     *,
     session: Session = ActiveSession,
@@ -80,21 +80,28 @@ async def update_task(
     task_id: int,
 ):
     """Update Task"""
-    task = session.exec(select(Task).where(Task.id == task_id)).first()
+    
+    task = session.get(Task, task_id)
 
     if not task:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Task not found"
         )
+
     if task.user.id != user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No Permission to update task of another user",
         )
 
-    query = update(Task).where(Task.id == task_id).values(**task_body.dict())
-    session.exec(query)
+    # Remove unset fields of request.
+    task_data = task_body.dict(exclude_unset=True)
+
+    for key, value in task_data.items():
+        setattr(task, key, value)
+    
+    session.add(task)
     session.commit()
     session.refresh(task)
-
     return task
