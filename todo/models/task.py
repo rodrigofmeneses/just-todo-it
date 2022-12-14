@@ -47,7 +47,7 @@ class Task(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     text: str
     date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    status: TaskStatus = Field(default='TODO', sa_column=Column(Enum(TaskStatus)), nullable=False)
+    status: TaskStatus = Field(default='TODO', nullable=False)
     user_id: int = Field(foreign_key="user.id")
 
     # It populates a `.tasks` attribute to the `User` model.
