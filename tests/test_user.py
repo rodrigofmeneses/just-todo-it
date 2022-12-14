@@ -1,11 +1,9 @@
-from todo.models.user import User, UserRequest, UserResponse
+from todo.models.user import User
 from todo.security import get_password_hash, verify_password
 
 
-def test_encode_password_hash():
-    password = '1234'
-    password_hashed = get_password_hash(password)
-    assert password != password_hashed
+def test_encode_password_hash(): 
+    assert '1234' != get_password_hash('1234')
     
 def test_verify_password_with_correctly_data():
     password = '1234'
