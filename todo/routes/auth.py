@@ -57,7 +57,7 @@ async def refresh_token(form_data: RefreshToken):
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "fresh": False},
+        data={"sub": user.username},
         expires_delta=access_token_expires,
     )
 

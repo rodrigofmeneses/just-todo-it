@@ -87,8 +87,7 @@ def get_user(username) -> Optional[User]:
 
 def get_current_user(
     token: str = Depends(oauth2_scheme), 
-    request: Request = None, 
-    fresh=False
+    request: Request = None
 ) -> User:
     """Get current user authenticated"""
     credentials_exception = HTTPException(
@@ -115,8 +114,6 @@ def get_current_user(
         raise credentials_exception
     user = get_user(username=token_data.username)
     if user is None:
-        raise credentials_exception
-    if fresh and (not payload["fresh"] and not user.superuser):
         raise credentials_exception
 
     return user
