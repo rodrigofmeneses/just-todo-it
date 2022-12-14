@@ -31,12 +31,39 @@ This project is design to be container first, so after cloning the respository:
 ```
 docker-compose up
 ```
-
-(Imagem do docker Desktop aqui)
+In other terminal, execute to apply migrations:
+```
+docker-compose exec api alembic upgrade head
+```
 
 To run tests a simple file has created in `test.sh`, so just run it.
 
-(Imagem dos testes)
+First type `chmod +x test.sh` to create a executable, so `./test.sh`:
+
+```
+[+] Running 2/2
+ ⠿ Container todo-api-db-1   Running                                           0.0s
+ ⠿ Container todo-api-api-1  Started                                           1.1s
+
+=============================== test session starts ================================
+platform linux -- Python 3.11.0, pytest-7.2.0, pluggy-1.0.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /home/app/api
+plugins: anyio-3.6.2, order-1.0.1
+collected 5 items                                                                  
+
+tests/test_user.py::test_encode_password_hash PASSED                         [ 20%]
+tests/test_user.py::test_verify_password_with_correctly_data PASSED          [ 40%]
+tests/test_user.py::test_verify_password_with_wrong_data PASSED              [ 60%]
+tests/test_user.py::test_two_passwords_has_different_hashs PASSED            [ 80%]
+tests/test_user.py::test_user_password_is_hashed PASSED                      [100%]
+
+=========================== 5 passed, 1 warning in 2.15s ===========================
+[+] Running 3/3
+ ⠿ Container todo-api-api-1  Removed                                           1.0s
+ ⠿ Container todo-api-db-1   Removed                                           0.5s
+ ⠿ Network todo-api_default  Removed                                           0.4s
+```
 
 If you opt for non docker developer environment, follow these steps:
 
