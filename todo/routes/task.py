@@ -1,13 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter, status
-from fastapi.exceptions import HTTPException
-from sqlmodel import Session, select, update
+from sqlmodel import Session, select
 
 from todo.auth import AuthenticatedUser
 from todo.db import ActiveSession
 from todo.models.task import Task, TaskRequest, TaskResponse, UpdateTaskRequest
 from todo.models.user import User
+from todo.routes.dependencies import ValidTaskId
 
 router = APIRouter()
 
@@ -32,21 +32,9 @@ async def list_all_tasks_by_user(
 @router.get("/{task_id}", response_model=TaskResponse)
 async def task_by_id(
     *,
-    session: Session = ActiveSession,
-    user: User = AuthenticatedUser,
-    task_id: int,
+    task: Task = ValidTaskId,
 ):
     """Get task by task id"""
-    task = session.get(Task, task_id)
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-        )
-    if user.id != task.user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Don't have authorization to see another user task",
-        )
     return task
 
 
@@ -72,26 +60,11 @@ async def create_task(
 @router.patch("/{task_id}", response_model=TaskResponse)
 async def update_task(
     *,
+    task: Task = ValidTaskId,
     session: Session = ActiveSession,
-    user: User = AuthenticatedUser,
     task_body: UpdateTaskRequest,
-    task_id: int,
 ):
     """Update Task"""
-
-    task = session.get(Task, task_id)
-
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-        )
-
-    if task.user.id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No Permission to update task of another user",
-        )
-
     # Remove unset fields of request.
     task_data = task_body.dict(exclude_unset=True)
 
@@ -108,25 +81,10 @@ async def update_task(
 async def delete_task(
     *,
     session: Session = ActiveSession,
-    user: User = AuthenticatedUser,
-    task_id: int,
+    task: Task = ValidTaskId,
 ):
     """Delete Task"""
-
-    task = session.get(Task, task_id)
-
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-        )
-
-    if task.user.id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No Permission to update task of another user",
-        )
-
     session.delete(task)
     session.commit()
 
-    return {"msg": f"Task {task_id} Deleted", "task": task}
+    return {"msg": f"Task {task.id} Deleted", "task": task}
