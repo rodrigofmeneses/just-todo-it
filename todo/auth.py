@@ -35,8 +35,7 @@ class TokenData(BaseModel):
 
 
 def create_access_token(
-    data: dict, 
-    expires_delta: Optional[timedelta] = None
+    data: dict, expires_delta: Optional[timedelta] = None
 ) -> str:
     """Creates a JWT Token from user data"""
     to_encode = data.copy()
@@ -50,8 +49,7 @@ def create_access_token(
 
 
 def create_refresh_token(
-    data: dict, 
-    expires_delta: Optional[timedelta] = None
+    data: dict, expires_delta: Optional[timedelta] = None
 ) -> str:
     """Refresh an expired token"""
     to_encode = data.copy()
@@ -65,9 +63,7 @@ def create_refresh_token(
 
 
 def authenticate_user(
-    get_user: Callable, 
-    username: str, 
-    password: str
+    get_user: Callable, username: str, password: str
 ) -> Union[User, bool]:
     """Authenticate the user"""
     user = get_user(username)
@@ -86,8 +82,7 @@ def get_user(username) -> Optional[User]:
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme), 
-    request: Request = None
+    token: str = Depends(oauth2_scheme), request: Request = None
 ) -> User:
     """Get current user authenticated"""
     credentials_exception = HTTPException(

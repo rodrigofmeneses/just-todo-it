@@ -39,7 +39,7 @@ def shell():
 def user_list():
     """Lists all users"""
     table = Table(title="Todo users")
-    fields = ['id', 'username']
+    fields = ["id", "username"]
     for header in fields:
         table.add_column(header, style="magenta")
 
@@ -49,6 +49,7 @@ def user_list():
             table.add_row(str(user.id), user.username)
 
     Console().print(table)
+
 
 @main.command()
 def create_user(username: str, password: str):
@@ -61,9 +62,10 @@ def create_user(username: str, password: str):
         typer.echo(f"created {username} user")
         return user
 
+
 @main.command()
-def delete_user(username:str):
-    '''Delete user'''
+def delete_user(username: str):
+    """Delete user"""
     with Session(engine) as session:
         statement = select(User).where(User.username == username)
         user = session.exec(statement).one()
@@ -71,6 +73,7 @@ def delete_user(username:str):
         session.commit()
         typer.echo(f"deleted {username} user")
         return user
+
 
 @main.command()
 def reset_db(
