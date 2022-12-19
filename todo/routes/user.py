@@ -1,7 +1,8 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
+from psycopg2.errors import UniqueViolation
 from sqlmodel import Session, select
 
 from todo.db import ActiveSession
@@ -44,7 +45,12 @@ async def get_user_by_username(
 async def create_user(*, session: Session = ActiveSession, user: UserRequest):
     """Creates new user"""
     db_user = User.from_orm(user)  # transform UserRequest in User
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
+    try:
+        session.add(db_user)
+        session.commit()
+    except UniqueViolation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already exists",
+        )
     return db_user
